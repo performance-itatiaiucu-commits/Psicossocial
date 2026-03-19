@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard ICQ</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa, #e8ecf1, #f0f2f5);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: #1a1a2e;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        /* HEADER / TÍTULO */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .header-logo {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 60px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .title-input-wrapper {
+            position: relative;
+            max-width: 700px;
+            margin: 0 auto 10px;
+        }
+
+        .title-input {
+            width: 100%;
+            padding: 16px 24px;
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.8);
+            color: #1a1a2e;
+            outline: none;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .title-input::placeholder {
+            color: rgba(0, 0, 0, 0.35);
+        }
+
+        .title-input:focus {
+            border-color: rgba(102, 126, 234, 0.5);
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 0 30px rgba(102, 126, 234, 0.15);
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: rgba(0, 0, 0, 0.5);
+            font-weight: 300;
+        }
+
+        /* PAINEL DE INPUTS */
+        .input-panel {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+        }
+
+        .input-panel h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: flex-end;
+        }
+
+        .input-group {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(0, 0, 0, 0.55);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #1a1a2e;
+            font-size: 16px;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .input-group input:focus {
+            border-color: rgba(102, 126, 234, 0.5);
+            background: #fff;
+        }
+
+        .input-group input::placeholder {
+            color: rgba(0, 0, 0, 0.3);
+            font-weight: 400;
+        }
+
+        .color-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+
+        .btn-update {
+            padding: 12px 32px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+            min-width: 150px;
+        }
+
+        .btn-update:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-update:active {
+            transform: translateY(0);
+        }
+
+        /* DASHBOARD */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 24px;
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.3s;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+        }
+
+        .card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: rgba(0, 0, 0, 0.6);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* VELOCÍMETRO */
+        .gauge-container {
+            position: relative;
+            width: 100%;
+            max-width: 320px;
+            margin: 0 auto 20px;
+        }
+
+        .gauge-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .gauge-value {
+            font-size: clamp(32px, 5vw, 48px);
+            font-weight: 900;
+            text-align: center;
+            margin: 10px 0 5px;
+            transition: color 0.5s;
+        }
+
+        .gauge-label {
+            font-size: clamp(12px, 1.5vw, 14px);
+            font-weight: 500;
+            color: rgba(0, 0, 0, 0.5);
+            margin-bottom: 15px;
+        }
+
+        .gauge-message {
+            font-size: clamp(12px, 1.5vw, 14px);
+            font-weight: 500;
+            padding: 14px 20px;
+            border-radius: 12px;
+            line-height: 1.5;
+            transition: all 0.5s;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        /* PIZZA 3D */
+        .pie-container {
+            position: relative;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto 20px;
+        }
+
+        .pie-container canvas {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .pie-canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .pie-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 0 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 14px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.03);
+            transition: background 0.3s;
+        }
+
+        .legend-item:hover {
+            background: rgba(0, 0, 0, 0.06);
+        }
+
+        .legend-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .legend-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(0, 0, 0, 0.75);
+        }
+
+        .legend-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        /* EXPORT */
+        .export-section {
+            text-align: center;
+            margin-top: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .btn-export {
+            padding: 14px 40px;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-export:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(245, 87, 108, 0.4);
+        }
+
+        /* ========== RESPONSIVO ========== */
+
+        /* Tablet landscape e telas médias */
+        @media (max-width: 1024px) {
+            .container {
+                max-width: 100%;
+            }
+
+            .input-panel {
+                padding: 24px;
+            }
+
+            .card {
+                padding: 24px;
+            }
+        }
+
+        /* Tablet portrait e celulares grandes */
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .title-input {
+                font-size: 18px;
+                padding: 14px 18px;
+            }
+
+            .title-input-wrapper {
+                max-width: 100%;
+            }
+
+            .input-row {
+                flex-direction: column;
+            }
+
+            .input-group {
+                min-width: 100%;
+            }
+
+            .input-group[style*="max-width"] {
+                max-width: 100% !important;
+            }
+
+            .input-panel {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+
+            .input-panel h2 {
+                font-size: 16px;
+            }
+
+            .card {
+                padding: 20px;
+                border-radius: 18px;
+            }
+
+            .card h3 {
+                font-size: 14px;
+                letter-spacing: 1.5px;
+            }
+
+            .gauge-container {
+                max-width: 280px;
+            }
+
+            .pie-container {
+                max-width: 260px;
+            }
+
+            .btn-update,
+            .btn-export {
+                width: 100%;
+                min-width: unset;
+            }
+
+            .export-section {
+                flex-direction: column;
+                align-items: stretch;
+                margin-top: 20px;
+            }
+
+            .header {
+                margin-bottom: 20px;
+            }
+        }
+
+        /* Celulares pequenos */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .header {
+                margin-bottom: 16px;
+            }
+
+            .title-input {
+                font-size: 16px;
+                padding: 12px 14px;
+                border-radius: 12px;
+            }
+
+            .subtitle {
+                font-size: 12px;
+            }
+
+            .input-panel {
+                padding: 16px;
+                border-radius: 14px;
+                margin-bottom: 16px;
+            }
+
+            .input-panel h2 {
+                font-size: 14px;
+                margin-bottom: 14px;
+            }
+
+            .input-group label {
+                font-size: 10px;
+            }
+
+            .input-group input {
+                padding: 10px 12px;
+                font-size: 14px;
+                border-radius: 10px;
+            }
+
+            .input-row {
+                gap: 12px;
+            }
+
+            .dashboard {
+                gap: 16px;
+            }
+
+            .card {
+                padding: 16px;
+                border-radius: 14px;
+            }
+
+            .card h3 {
+                font-size: 12px;
+                margin-bottom: 14px;
+                letter-spacing: 1px;
+            }
+
+            .gauge-container {
+                max-width: 240px;
+            }
+
+            .pie-container {
+                max-width: 220px;
+            }
+
+            .gauge-message {
+                font-size: 12px;
+                padding: 10px 14px;
+            }
+
+            .legend-item {
+                padding: 6px 10px;
+            }
+
+            .legend-name {
+                font-size: 11px;
+            }
+
+            .legend-value {
+                font-size: 12px;
+            }
+
+            .btn-update,
+            .btn-export {
+                padding: 12px 20px;
+                font-size: 14px;
+                border-radius: 10px;
+            }
+
+            .export-section {
+                margin-top: 16px;
+            }
+        }
+
+        /* Animação de entrada */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        /* Needle animation */
+        @keyframes needleBounce {
+            0% {
+                transform: rotate(var(--start-angle));
+            }
+
+            60% {
+                transform: rotate(calc(var(--end-angle) + 5deg));
+            }
+
+            80% {
+                transform: rotate(calc(var(--end-angle) - 2deg));
+            }
+
+            100% {
+                transform: rotate(var(--end-angle));
+            }
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px 0;
+            font-size: 13px;
+            color: rgba(0, 0, 0, 0.4);
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- TÍTULO -->
+        <div class="header">
+            <img src="logo.png" alt="Grupo Performance" class="header-logo">
+            <div class="title-input-wrapper">
+                <input type="text" class="title-input" id="titleInput" placeholder="Digite o título aqui..."
+                    value="Índice de Clima Organizacional">
+            </div>
+            <p class="subtitle">Dashboard de Indicadores ICQ</p>
+        </div>
+
+        <!-- PAINEL DE INPUTS -->
+        <div class="input-panel">
+            <h2>⚙️ Configurar Dados</h2>
+
+            <div style="margin-bottom: 20px;">
+                <div class="input-row">
+                    <div class="input-group" style="max-width: 200px;">
+                        <label>Valor ICQ (1.00 - 5.00)</label>
+                        <input type="number" id="icqValue" min="1" max="5" step="0.01" value="3.25"
+                            placeholder="Ex: 3.25">
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h2>📊 Porcentagens</h2>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label><span class="color-dot" style="background:#e74c3c"></span> Sempre (%)</label>
+                        <input type="number" id="pSempre" min="0" max="100" step="0.1" value="15" placeholder="0">
+                    </div>
+                    <div class="input-group">
+                        <label><span class="color-dot" style="background:#e67e22"></span> Frequentemente (%)</label>
+                        <input type="number" id="pFrequentemente" min="0" max="100" step="0.1" value="25"
+                            placeholder="0">
+                    </div>
+                    <div class="input-group">
+                        <label><span class="color-dot" style="background:#f1c40f"></span> Às Vezes (%)</label>
+                        <input type="number" id="pAsVezes" min="0" max="100" step="0.1" value="30" placeholder="0">
+                    </div>
+                    <div class="input-group">
+                        <label><span class="color-dot" style="background:#3498db"></span> Raramente (%)</label>
+                        <input type="number" id="pRaramente" min="0" max="100" step="0.1" value="20" placeholder="0">
+                    </div>
+                    <div class="input-group">
+                        <label><span class="color-dot" style="background:#2ecc71"></span> Nunca (%)</label>
+                        <input type="number" id="pNunca" min="0" max="100" step="0.1" value="10" placeholder="0">
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align:center;">
+                <button class="btn-update" onclick="updateDashboard()">🔄 Atualizar Dashboard</button>
+            </div>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div class="dashboard">
+            <!-- Card ICQ Velocímetro -->
+            <div class="card">
+                <h3>📊 Índice ICQ</h3>
+                <div class="gauge-container">
+                    <canvas id="gaugeCanvas" width="640" height="400"></canvas>
+                </div>
+                <div class="gauge-value" id="gaugeValueText">3.25</div>
+                <div class="gauge-label">Índice de Clima</div>
+                <div class="gauge-message" id="gaugeMessage">
+                    Situação sob controle, manter as boas práticas.
+                </div>
+            </div>
+
+            <!-- Card Pizza 3D -->
+            <div class="card">
+                <h3>📈 Distribuição de Respostas</h3>
+                <div class="pie-container">
+                    <canvas id="pieCanvas" width="600" height="600"></canvas>
+                </div>
+                <div class="pie-legend" id="pieLegend"></div>
+            </div>
+        </div>
+
+        <!-- EXPORTAR -->
+        <div class="export-section">
+            <button class="btn-export" onclick="exportImage()">📷 Exportar como Imagem</button>
+        </div>
+
+        <!-- RODAPÉ -->
+        <footer class="footer">
+            <p>© 2026 Performance Ocupacional — Uso restrito. Todos os direitos reservados.</p>
+        </footer>
+    </div>
+
+    <script>
+        // ============================================
+        // CONFIGURAÇÕES
+        // ============================================
+        const COLORS = {
+            sempre: '#e74c3c',
+            frequentemente: '#e67e22',
+            asVezes: '#f1c40f',
+            raramente: '#3498db',
+            nunca: '#2ecc71'
+        };
+
+        const ICQ_RANGES = [
+            { min: 1.00, max: 1.50, color: '#e74c3c', msg: 'Risco elevado e difuso, exige intervenção urgente.', bg: 'rgba(231,76,60,0.15)', border: 'rgba(231,76,60,0.4)' },
+            { min: 1.51, max: 2.00, color: '#e67e22', msg: 'Situação preocupante, exige ações corretivas imediatas.', bg: 'rgba(230,126,34,0.15)', border: 'rgba(230,126,34,0.4)' },
+            { min: 2.01, max: 3.00, color: '#f1c40f', msg: 'Atenção pontual e medidas preventivas.', bg: 'rgba(241,196,15,0.15)', border: 'rgba(241,196,15,0.4)' },
+            { min: 3.01, max: 4.00, color: '#3498db', msg: 'Situação sob controle, manter as boas práticas.', bg: 'rgba(52,152,219,0.15)', border: 'rgba(52,152,219,0.4)' },
+            { min: 4.01, max: 5.00, color: '#2ecc71', msg: 'Ambiente saudável, manter e reforçar as ações.', bg: 'rgba(46,204,113,0.15)', border: 'rgba(46,204,113,0.4)' }
+        ];
+
+        // ============================================
+        // VELOCÍMETRO (GAUGE)
+        // ============================================
+        function getICQRange(value) {
+            for (let r of ICQ_RANGES) {
+                if (value >= r.min && value <= r.max) return r;
+            }
+            return ICQ_RANGES[0];
+        }
+
+        function drawGauge(value) {
+            const canvas = document.getElementById('gaugeCanvas');
+            const container = canvas.parentElement;
+            const dpr = window.devicePixelRatio || 1;
+            const displayW = container.clientWidth;
+            const displayH = Math.round(displayW * 0.625);
+            canvas.width = displayW * dpr;
+            canvas.height = displayH * dpr;
+            canvas.style.width = displayW + 'px';
+            canvas.style.height = displayH + 'px';
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+            const W = displayW;
+            const H = displayH;
+
+            ctx.clearRect(0, 0, W, H);
+
+            const cx = W / 2;
+            const cy = H - Math.round(H * 0.05);
+            const radius = W * 0.375;
+            const lineWidth = W * 0.078;
+
+            const startAngle = Math.PI;
+            const endAngle = 2 * Math.PI;
+
+            // Segmentos do velocímetro
+            const segments = [
+                { start: 1.00, end: 1.50, color: '#e74c3c' },
+                { start: 1.50, end: 2.00, color: '#e67e22' },
+                { start: 2.00, end: 3.00, color: '#f1c40f' },
+                { start: 3.00, end: 4.00, color: '#3498db' },
+                { start: 4.00, end: 5.00, color: '#2ecc71' }
+            ];
+
+            const totalRange = 5.0 - 1.0; // 4.0
+
+            // Sombra do arco
+            ctx.save();
+            ctx.shadowColor = 'rgba(0,0,0,0.15)';
+            ctx.shadowBlur = 20;
+            ctx.shadowOffsetY = 5;
+
+            // Desenhar fundo do arco
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, startAngle, endAngle);
+            ctx.lineWidth = lineWidth + 4;
+            ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+            ctx.lineCap = 'round';
+            ctx.stroke();
+            ctx.restore();
+
+            // Desenhar segmentos coloridos
+            segments.forEach(seg => {
+                const segStart = startAngle + ((seg.start - 1.0) / totalRange) * Math.PI;
+                const segEnd = startAngle + ((seg.end - 1.0) / totalRange) * Math.PI;
+
+                ctx.beginPath();
+                ctx.arc(cx, cy, radius, segStart, segEnd);
+                ctx.lineWidth = lineWidth;
+                ctx.strokeStyle = seg.color;
+                ctx.lineCap = 'butt';
+                ctx.stroke();
+
+                // Brilho interno
+                const gradient = ctx.createRadialGradient(cx, cy, radius - lineWidth / 2, cx, cy, radius + lineWidth / 2);
+                gradient.addColorStop(0, 'rgba(255,255,255,0.15)');
+                gradient.addColorStop(0.5, 'rgba(255,255,255,0)');
+                gradient.addColorStop(1, 'rgba(0,0,0,0.1)');
+
+                ctx.beginPath();
+                ctx.arc(cx, cy, radius, segStart, segEnd);
+                ctx.lineWidth = lineWidth;
+                ctx.strokeStyle = gradient;
+                ctx.stroke();
+            });
+
+            // Separadores entre segmentos
+            [1.5, 2.0, 3.0, 4.0].forEach(val => {
+                const angle = startAngle + ((val - 1.0) / totalRange) * Math.PI;
+                const innerR = radius - lineWidth / 2 - 2;
+                const outerR = radius + lineWidth / 2 + 2;
+
+                ctx.beginPath();
+                ctx.moveTo(cx + innerR * Math.cos(angle), cy + innerR * Math.sin(angle));
+                ctx.lineTo(cx + outerR * Math.cos(angle), cy + outerR * Math.sin(angle));
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+                ctx.stroke();
+            });
+
+            // Marcadores de escala
+            const scaleFontSize = Math.max(10, Math.round(W * 0.028));
+            for (let v = 1.0; v <= 5.0; v += 0.5) {
+                const angle = startAngle + ((v - 1.0) / totalRange) * Math.PI;
+                const outerR = radius + lineWidth / 2 + Math.round(W * 0.023);
+                const tx = cx + outerR * Math.cos(angle);
+                const ty = cy + outerR * Math.sin(angle);
+
+                ctx.save();
+                ctx.fillStyle = 'rgba(0,0,0,0.55)';
+                ctx.font = `500 ${scaleFontSize}px Inter, sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(v.toFixed(1), tx, ty);
+                ctx.restore();
+            }
+
+            // Ticks menores
+            for (let v = 1.0; v <= 5.0; v += 0.25) {
+                const angle = startAngle + ((v - 1.0) / totalRange) * Math.PI;
+                const isMajor = (v * 2) % 1 === 0;
+                const innerR = radius - lineWidth / 2 + (isMajor ? 5 : 10);
+                const outerR = radius - lineWidth / 2;
+
+                ctx.beginPath();
+                ctx.moveTo(cx + innerR * Math.cos(angle), cy + innerR * Math.sin(angle));
+                ctx.lineTo(cx + outerR * Math.cos(angle), cy + outerR * Math.sin(angle));
+                ctx.lineWidth = isMajor ? 2 : 1;
+                ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+                ctx.stroke();
+            }
+
+            // PONTEIRO (NEEDLE)
+            const clampedValue = Math.max(1, Math.min(5, value));
+            const needleAngle = startAngle + ((clampedValue - 1.0) / totalRange) * Math.PI;
+            const needleLength = radius - lineWidth / 2 - Math.round(W * 0.023);
+            const range = getICQRange(clampedValue);
+
+            // Sombra do ponteiro
+            ctx.save();
+            ctx.shadowColor = 'rgba(0,0,0,0.25)';
+            ctx.shadowBlur = 10;
+            ctx.shadowOffsetY = 3;
+
+            // Ponteiro
+            ctx.beginPath();
+            ctx.moveTo(cx + needleLength * Math.cos(needleAngle), cy + needleLength * Math.sin(needleAngle));
+            const baseWidth = Math.max(6, Math.round(W * 0.019));
+            const perpAngle = needleAngle + Math.PI / 2;
+            ctx.lineTo(cx + baseWidth * Math.cos(perpAngle), cy + baseWidth * Math.sin(perpAngle));
+            ctx.lineTo(cx - baseWidth * Math.cos(perpAngle), cy - baseWidth * Math.sin(perpAngle));
+            ctx.closePath();
+            ctx.fillStyle = '#333';
+            ctx.fill();
+            ctx.restore();
+
+            // Centro do ponteiro
+            const outerDot = Math.max(8, Math.round(W * 0.028));
+            const innerDot = Math.max(4, Math.round(W * 0.016));
+            ctx.beginPath();
+            ctx.arc(cx, cy, outerDot, 0, Math.PI * 2);
+            ctx.fillStyle = range.color;
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(cx, cy, innerDot, 0, Math.PI * 2);
+            ctx.fillStyle = '#f5f7fa';
+            ctx.fill();
+
+            // Atualizar valor e mensagem
+            const valueText = document.getElementById('gaugeValueText');
+            valueText.textContent = clampedValue.toFixed(2);
+            valueText.style.color = range.color;
+
+            const msgEl = document.getElementById('gaugeMessage');
+            msgEl.textContent = range.msg;
+            msgEl.style.background = range.bg;
+            msgEl.style.border = `1px solid ${range.border}`;
+            msgEl.style.color = range.color;
+        }
+
+        // ============================================
+        // PIZZA 3D
+        // ============================================
+        function drawPie3D(data) {
+            const canvas = document.getElementById('pieCanvas');
+            const container = canvas.parentElement;
+            const dpr = window.devicePixelRatio || 1;
+            const displayW = container.clientWidth;
+            const displayH = displayW;
+            canvas.width = displayW * dpr;
+            canvas.height = displayH * dpr;
+            canvas.style.width = displayW + 'px';
+            canvas.style.height = displayH + 'px';
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+            const W = displayW;
+            const H = displayH;
+
+            ctx.clearRect(0, 0, W, H);
+
+            const cx = W / 2;
+            const cy = H / 2 - Math.round(H * 0.033);
+            const rx = W * 0.367; // raio X (elipse) — relativo
+            const ry = H * 0.267; // raio Y (elipse para efeito 3D) — relativo
+            const depth = Math.round(H * 0.067); // profundidade 3D — relativo
+
+            const total = data.reduce((sum, d) => sum + d.value, 0);
+            if (total === 0) return;
+
+            let angles = [];
+            let currentAngle = -Math.PI / 2;
+
+            data.forEach(d => {
+                const sliceAngle = (d.value / total) * Math.PI * 2;
+                angles.push({
+                    start: currentAngle,
+                    end: currentAngle + sliceAngle,
+                    color: d.color,
+                    name: d.name,
+                    value: d.value
+                });
+                currentAngle += sliceAngle;
+            });
+
+            // Desenhar laterais 3D (de trás para frente)
+            // Ordenar por posição Y para renderizar corretamente
+            const sortedForSide = [...angles].sort((a, b) => {
+                const midA = (a.start + a.end) / 2;
+                const midB = (b.start + b.end) / 2;
+                return Math.sin(midA) - Math.sin(midB);
+            });
+
+            // Laterais 3D
+            angles.forEach(slice => {
+                // Só desenhar lado 3D para fatias na parte inferior
+                const steps = 100;
+                const stepAngle = (slice.end - slice.start) / steps;
+
+                for (let i = 0; i < steps; i++) {
+                    const a1 = slice.start + stepAngle * i;
+                    const a2 = slice.start + stepAngle * (i + 1);
+
+                    if (Math.sin(a1) > -0.2) { // apenas parte inferior visível
+                        ctx.beginPath();
+                        ctx.moveTo(cx + rx * Math.cos(a1), cy + ry * Math.sin(a1));
+                        ctx.lineTo(cx + rx * Math.cos(a2), cy + ry * Math.sin(a2));
+                        ctx.lineTo(cx + rx * Math.cos(a2), cy + ry * Math.sin(a2) + depth);
+                        ctx.lineTo(cx + rx * Math.cos(a1), cy + ry * Math.sin(a1) + depth);
+                        ctx.closePath();
+
+                        // Cor mais escura para lado 3D
+                        ctx.fillStyle = darkenColor(slice.color, 0.5);
+                        ctx.fill();
+                    }
+                }
+            });
+
+            // Borda lateral das fatias
+            angles.forEach(slice => {
+                [slice.start, slice.end].forEach(angle => {
+                    if (Math.sin(angle) > -0.3) {
+                        ctx.beginPath();
+                        ctx.moveTo(cx, cy);
+                        ctx.lineTo(cx + rx * Math.cos(angle), cy + ry * Math.sin(angle));
+                        ctx.lineTo(cx + rx * Math.cos(angle), cy + ry * Math.sin(angle) + depth);
+                        ctx.lineTo(cx, cy + depth);
+                        ctx.closePath();
+                        ctx.fillStyle = darkenColor(slice.color, 0.4);
+                        ctx.fill();
+                    }
+                });
+            });
+
+            // Topo da pizza
+            angles.forEach(slice => {
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                // Desenhar arco elíptico
+                for (let a = slice.start; a <= slice.end; a += 0.01) {
+                    ctx.lineTo(cx + rx * Math.cos(a), cy + ry * Math.sin(a));
+                }
+                ctx.lineTo(cx + rx * Math.cos(slice.end), cy + ry * Math.sin(slice.end));
+                ctx.closePath();
+
+                // Gradiente para efeito de brilho
+                const midAngle = (slice.start + slice.end) / 2;
+                const gx = cx + rx * 0.5 * Math.cos(midAngle);
+                const gy = cy + ry * 0.5 * Math.sin(midAngle);
+                const grad = ctx.createRadialGradient(cx - 30, cy - 30, 10, cx, cy, rx);
+                grad.addColorStop(0, lightenColor(slice.color, 0.3));
+                grad.addColorStop(1, slice.color);
+
+                ctx.fillStyle = grad;
+                ctx.fill();
+
+                // Borda
+                ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            });
+
+            // Brilho no topo
+            ctx.save();
+            ctx.beginPath();
+            ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+            ctx.clip();
+
+            const shineGrad = ctx.createLinearGradient(cx - rx, cy - ry, cx + rx / 2, cy + ry / 2);
+            shineGrad.addColorStop(0, 'rgba(255,255,255,0.15)');
+            shineGrad.addColorStop(0.5, 'rgba(255,255,255,0)');
+            shineGrad.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = shineGrad;
+            ctx.fillRect(cx - rx, cy - ry, rx * 2, ry * 2);
+            ctx.restore();
+
+            // Labels nas fatias
+            angles.forEach(slice => {
+                if (slice.value > 0) {
+                    const midAngle = (slice.start + slice.end) / 2;
+                    const labelR = 0.65;
+                    const lx = cx + rx * labelR * Math.cos(midAngle);
+                    const ly = cy + ry * labelR * Math.sin(midAngle);
+
+                    const pct = ((slice.value / total) * 100).toFixed(1);
+
+                    ctx.save();
+                    const pieLabelSize = Math.max(11, Math.round(W * 0.037));
+                    ctx.font = `bold ${pieLabelSize}px Inter, sans-serif`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+
+                    // Sombra do texto
+                    ctx.shadowColor = 'rgba(0,0,0,0.6)';
+                    ctx.shadowBlur = 4;
+                    ctx.shadowOffsetX = 1;
+                    ctx.shadowOffsetY = 1;
+
+                    ctx.fillStyle = '#fff';
+                    ctx.fillText(pct + '%', lx, ly);
+                    ctx.restore();
+                }
+            });
+
+            // Atualizar legenda
+            updateLegend(data, total);
+        }
+
+        function updateLegend(data, total) {
+            const container = document.getElementById('pieLegend');
+            container.innerHTML = '';
+
+            data.forEach(d => {
+                const pct = total > 0 ? ((d.value / total) * 100).toFixed(1) : '0.0';
+                const item = document.createElement('div');
+                item.className = 'legend-item';
+                item.innerHTML = `
+                    <div class="legend-left">
+                        <div class="legend-color" style="background:${d.color}"></div>
+                        <span class="legend-name">${d.name}</span>
+                    </div>
+                    <span class="legend-value">${pct}%</span>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // ============================================
+        // UTILIDADES DE COR
+        // ============================================
+        function darkenColor(hex, factor) {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return `rgb(${Math.floor(r * factor)}, ${Math.floor(g * factor)}, ${Math.floor(b * factor)})`;
+        }
+
+        function lightenColor(hex, factor) {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return `rgb(${Math.min(255, Math.floor(r + (255 - r) * factor))}, ${Math.min(255, Math.floor(g + (255 - g) * factor))}, ${Math.min(255, Math.floor(b + (255 - b) * factor))})`;
+        }
+
+        // ============================================
+        // ATUALIZAR DASHBOARD
+        // ============================================
+        function updateDashboard() {
+            const icqValue = parseFloat(document.getElementById('icqValue').value) || 1;
+            const sempre = parseFloat(document.getElementById('pSempre').value) || 0;
+            const frequentemente = parseFloat(document.getElementById('pFrequentemente').value) || 0;
+            const asVezes = parseFloat(document.getElementById('pAsVezes').value) || 0;
+            const raramente = parseFloat(document.getElementById('pRaramente').value) || 0;
+            const nunca = parseFloat(document.getElementById('pNunca').value) || 0;
+
+            // Animar o gauge
+            animateGauge(icqValue);
+
+            // Desenhar pizza
+            const pieData = [
+                { name: 'Sempre', value: sempre, color: COLORS.sempre },
+                { name: 'Frequentemente', value: frequentemente, color: COLORS.frequentemente },
+                { name: 'Às Vezes', value: asVezes, color: COLORS.asVezes },
+                { name: 'Raramente', value: raramente, color: COLORS.raramente },
+                { name: 'Nunca', value: nunca, color: COLORS.nunca }
+            ];
+
+            drawPie3D(pieData);
+        }
+
+        // ============================================
+        // ANIMAÇÃO DO GAUGE
+        // ============================================
+        let currentGaugeValue = 1;
+        let gaugeAnimationId = null;
+
+        function animateGauge(targetValue) {
+            if (gaugeAnimationId) cancelAnimationFrame(gaugeAnimationId);
+
+            const startValue = currentGaugeValue;
+            const startTime = performance.now();
+            const duration = 1200;
+
+            function animate(time) {
+                const elapsed = time - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+
+                // Easing function (ease out bounce-like)
+                const eased = 1 - Math.pow(1 - progress, 3);
+
+                const currentVal = startValue + (targetValue - startValue) * eased;
+                currentGaugeValue = currentVal;
+
+                drawGauge(currentVal);
+
+                if (progress < 1) {
+                    gaugeAnimationId = requestAnimationFrame(animate);
+                }
+            }
+
+            gaugeAnimationId = requestAnimationFrame(animate);
+        }
+
+        // ============================================
+        // EXPORTAR COMO IMAGEM
+        // ============================================
+        function exportImage() {
+            const dashboard = document.querySelector('.dashboard');
+            const title = document.getElementById('titleInput').value || 'Dashboard ICQ';
+
+            // Criar canvas para exportação
+            const exportCanvas = document.createElement('canvas');
+            const scale = 2;
+            const width = 1200;
+            const height = 700;
+            exportCanvas.width = width * scale;
+            exportCanvas.height = height * scale;
+            const ctx = exportCanvas.getContext('2d');
+            ctx.scale(scale, scale);
+
+            // Fundo
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, width, height);
+
+            // Título
+            ctx.fillStyle = '#1a1a2e';
+            ctx.font = 'bold 28px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(title, width / 2, 50);
+
+            // Copiar gauge canvas
+            const gaugeCanvas = document.getElementById('gaugeCanvas');
+            const gaugeScale = 0.55;
+            const gaugeX = 100;
+            const gaugeY = 100;
+            ctx.drawImage(gaugeCanvas, gaugeX, gaugeY, gaugeCanvas.width * gaugeScale, gaugeCanvas.height * gaugeScale);
+
+            // Valor ICQ
+            const icqVal = parseFloat(document.getElementById('icqValue').value) || 1;
+            const range = getICQRange(icqVal);
+            ctx.fillStyle = range.color;
+            ctx.font = 'bold 42px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(icqVal.toFixed(2), gaugeX + (gaugeCanvas.width * gaugeScale) / 2, gaugeY + gaugeCanvas.height * gaugeScale + 45);
+
+            // Mensagem
+            ctx.font = '14px Inter, sans-serif';
+            ctx.fillStyle = range.color;
+            ctx.fillText(range.msg, gaugeX + (gaugeCanvas.width * gaugeScale) / 2, gaugeY + gaugeCanvas.height * gaugeScale + 80);
+
+            // Copiar pie canvas
+            const pieCanvas = document.getElementById('pieCanvas');
+            const pieScale = 0.55;
+            const pieX = 620;
+            const pieY = 100;
+            ctx.drawImage(pieCanvas, pieX, pieY, pieCanvas.width * pieScale, pieCanvas.height * pieScale);
+
+            // Legenda
+            const pieData = [
+                { name: 'Sempre', value: parseFloat(document.getElementById('pSempre').value) || 0, color: COLORS.sempre },
+                { name: 'Frequentemente', value: parseFloat(document.getElementById('pFrequentemente').value) || 0, color: COLORS.frequentemente },
+                { name: 'Às Vezes', value: parseFloat(document.getElementById('pAsVezes').value) || 0, color: COLORS.asVezes },
+                { name: 'Raramente', value: parseFloat(document.getElementById('pRaramente').value) || 0, color: COLORS.raramente },
+                { name: 'Nunca', value: parseFloat(document.getElementById('pNunca').value) || 0, color: COLORS.nunca }
+            ];
+            const total = pieData.reduce((s, d) => s + d.value, 0);
+
+            let legendY = pieY + pieCanvas.height * pieScale + 20;
+            ctx.textAlign = 'left';
+            pieData.forEach((d, i) => {
+                const lx = pieX + 40;
+                const ly = legendY + i * 24;
+                ctx.fillStyle = d.color;
+                ctx.fillRect(lx, ly - 8, 12, 12);
+                ctx.fillStyle = 'rgba(0,0,0,0.7)';
+                ctx.font = '13px Inter, sans-serif';
+                ctx.fillText(`${d.name}: ${total > 0 ? ((d.value / total) * 100).toFixed(1) : 0}%`, lx + 20, ly + 2);
+            });
+
+            // Download
+            const link = document.createElement('a');
+            link.download = `${title.replace(/\s+/g, '_')}_ICQ.png`;
+            link.href = exportCanvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // ============================================
+        // INICIALIZAÇÃO
+        // ============================================
+        window.addEventListener('load', () => {
+            updateDashboard();
+        });
+
+        // Redesenhar ao redimensionar a janela (com debounce)
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                updateDashboard();
+            }, 150);
+        });
+
+        // Enter para atualizar
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') updateDashboard();
+            });
+        });
+    </script>
+</body>
+
+</html>
