@@ -1155,51 +1155,115 @@
             const title = document.getElementById('titleInput').value || 'Dashboard ICQ';
 
             // Criar canvas para exportação
+            const scale = 2; // Alta resolução
+            const width = 800; // Modo retrato
+            
+            let offset = 0;
+            const logoEl = document.querySelector('.header-logo');
+            if (logoEl && logoEl.complete && logoEl.naturalHeight > 0) {
+                offset = 100; // Espaço reservado para a logo no topo
+            }
+            
+            const height = 1850 + offset; // Altura expandida para mostrar todas as legendas e a logo
             const exportCanvas = document.createElement('canvas');
-            const scale = 2;
-            const width = 1200;
-            const height = 700;
             exportCanvas.width = width * scale;
             exportCanvas.height = height * scale;
             const ctx = exportCanvas.getContext('2d');
             ctx.scale(scale, scale);
 
             // Fundo
-            ctx.fillStyle = '#ffffff';
+            const bgGradient = ctx.createLinearGradient(0, 0, width, height);
+            bgGradient.addColorStop(0, '#f5f7fa');
+            bgGradient.addColorStop(1, '#e8ecf1');
+            ctx.fillStyle = bgGradient;
             ctx.fillRect(0, 0, width, height);
+
+            // Logomarca (Centralizada no topo)
+            if (offset > 0) {
+                const logoHeight = 60;
+                const ratio = logoEl.naturalWidth / logoEl.naturalHeight;
+                const logoWidth = logoHeight * ratio;
+                ctx.drawImage(logoEl, (width - logoWidth) / 2, 40, logoWidth, logoHeight);
+            }
 
             // Título
             ctx.fillStyle = '#1a1a2e';
-            ctx.font = 'bold 28px Inter, sans-serif';
+            ctx.font = 'bold 34px Inter, sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText(title, width / 2, 50);
+            ctx.fillText(title, width / 2, 80 + offset);
+            
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.font = '18px Inter, sans-serif';
+            ctx.fillText('Dashboard de Indicadores ICQ', width / 2, 115 + offset);
 
-            // Copiar gauge canvas
-            const gaugeCanvas = document.getElementById('gaugeCanvas');
-            const gaugeScale = 0.55;
-            const gaugeX = 100;
-            const gaugeY = 100;
-            ctx.drawImage(gaugeCanvas, gaugeX, gaugeY, gaugeCanvas.width * gaugeScale, gaugeCanvas.height * gaugeScale);
+            // ----------------------------------------------------------------
+            // 1. ÁREA DO GAUGE (Índice ICQ)
+            // ----------------------------------------------------------------
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+            ctx.font = 'bold 22px Inter, sans-serif';
+            ctx.fillText('📊 ÍNDICE ICQ', width / 2, 200 + offset);
+
+            let gaugeCanvas = document.getElementById('gaugeCanvas');
+            const gaugeDestWidth = 640;
+            const gaugeDestHeight = gaugeDestWidth * (gaugeCanvas.height / gaugeCanvas.width);
+            const gaugeX = (width - gaugeDestWidth) / 2;
+            const gaugeY = 240 + offset;
+            ctx.drawImage(gaugeCanvas, gaugeX, gaugeY, gaugeDestWidth, gaugeDestHeight);
 
             // Valor ICQ
             const icqVal = parseFloat(document.getElementById('icqValue').value) || 1;
             const range = getICQRange(icqVal);
             ctx.fillStyle = range.color;
-            ctx.font = 'bold 42px Inter, sans-serif';
+            ctx.font = 'bold 64px Inter, sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText(icqVal.toFixed(2), gaugeX + (gaugeCanvas.width * gaugeScale) / 2, gaugeY + gaugeCanvas.height * gaugeScale + 45);
+            ctx.fillText(icqVal.toFixed(2), width / 2, gaugeY + gaugeDestHeight + 60);
+
+            // Rótulo abaixo do valor
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.font = '500 16px Inter, sans-serif';
+            ctx.fillText('Índice de Clima', width / 2, gaugeY + gaugeDestHeight + 85);
 
             // Mensagem
-            ctx.font = '14px Inter, sans-serif';
-            ctx.fillStyle = range.color;
-            ctx.fillText(range.msg, gaugeX + (gaugeCanvas.width * gaugeScale) / 2, gaugeY + gaugeCanvas.height * gaugeScale + 80);
+            ctx.font = '500 20px Inter, sans-serif';
+            const msgWidth = ctx.measureText(range.msg).width + 80;
+            const msgHeight = 46;
+            const msgX = (width - msgWidth) / 2;
+            const msgY = gaugeY + gaugeDestHeight + 115;
 
-            // Copiar pie canvas
+            ctx.fillStyle = range.bg;
+            if (ctx.roundRect) {
+                ctx.beginPath();
+                ctx.roundRect(msgX, msgY, msgWidth, msgHeight, 16);
+                ctx.fill();
+                ctx.strokeStyle = range.border;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            } else {
+                ctx.fillRect(msgX, msgY, msgWidth, msgHeight);
+            }
+
+            ctx.fillStyle = range.color;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(range.msg, width / 2, msgY + msgHeight / 2);
+
+            // ----------------------------------------------------------------
+            // 2. ÁREA DA PIZZA (Distribuição)
+            // ----------------------------------------------------------------
+            ctx.textBaseline = 'alphabetic'; // Reset baseline
+            const pieSectionY = gaugeY + gaugeDestHeight + 250;
+            
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+            ctx.font = 'bold 22px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('📈 DISTRIBUIÇÃO DE RESPOSTAS', width / 2, pieSectionY);
+
             const pieCanvas = document.getElementById('pieCanvas');
-            const pieScale = 0.55;
-            const pieX = 620;
-            const pieY = 100;
-            ctx.drawImage(pieCanvas, pieX, pieY, pieCanvas.width * pieScale, pieCanvas.height * pieScale);
+            const pieDestWidth = 500;
+            const pieDestHeight = pieDestWidth * (pieCanvas.height / pieCanvas.width);
+            const pieX = (width - pieDestWidth) / 2;
+            const pieY = pieSectionY + 40;
+            ctx.drawImage(pieCanvas, pieX, pieY, pieDestWidth, pieDestHeight);
 
             // Legenda
             const pieData = [
@@ -1211,17 +1275,43 @@
             ];
             const total = pieData.reduce((s, d) => s + d.value, 0);
 
-            let legendY = pieY + pieCanvas.height * pieScale + 20;
-            ctx.textAlign = 'left';
+            let legendY = pieY + pieDestHeight + 50;
+            const legendStartX = width / 2 - 140; 
+
             pieData.forEach((d, i) => {
-                const lx = pieX + 40;
-                const ly = legendY + i * 24;
+                const lx = legendStartX;
+                const ly = legendY + i * 48;
+                
+                // Marcador (bolinha)
                 ctx.fillStyle = d.color;
-                ctx.fillRect(lx, ly - 8, 12, 12);
-                ctx.fillStyle = 'rgba(0,0,0,0.7)';
-                ctx.font = '13px Inter, sans-serif';
-                ctx.fillText(`${d.name}: ${total > 0 ? ((d.value / total) * 100).toFixed(1) : 0}%`, lx + 20, ly + 2);
+                ctx.beginPath();
+                ctx.arc(lx + 10, ly, 10, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                // Nome
+                ctx.fillStyle = 'rgba(0,0,0,0.8)';
+                ctx.font = '500 20px Inter, sans-serif';
+                ctx.textAlign = 'left';
+                const pct = total > 0 ? ((d.value / total) * 100).toFixed(1) : 0;
+                ctx.fillText(`${d.name}`, lx + 35, ly + 6);
+                
+                // Porcentagem
+                ctx.fillStyle = '#1a1a2e';
+                ctx.font = 'bold 22px Inter, sans-serif';
+                ctx.textAlign = 'right';
+                ctx.fillText(`${pct}%`, lx + 280, ly + 6);
             });
+
+            // ----------------------------------------------------------------
+            // 3. RODAPÉ
+            // ----------------------------------------------------------------
+            ctx.fillStyle = 'rgba(0,0,0,0.1)';
+            ctx.fillRect(80, height - 80, width - 160, 1);
+            
+            ctx.fillStyle = 'rgba(0,0,0,0.4)';
+            ctx.font = '15px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('© 2026 Performance Ocupacional — Uso restrito. Todos os direitos reservados.', width / 2, height - 40);
 
             // Download
             const link = document.createElement('a');
