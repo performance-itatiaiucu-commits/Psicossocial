@@ -66,6 +66,9 @@
             outline: none;
             transition: all 0.3s;
             backdrop-filter: blur(10px);
+            resize: none;
+            overflow: hidden;
+            line-height: 1.2;
         }
 
         .title-input::placeholder {
@@ -597,8 +600,9 @@
         <div class="header">
             <img src="logo.png" alt="Grupo Performance" class="header-logo">
             <div class="title-input-wrapper">
-                <input type="text" class="title-input" id="titleInput" placeholder="Digite o título aqui..."
-                    value="Índice de Clima Organizacional">
+                <textarea class="title-input" id="titleInput" placeholder="Digite o título aqui..." rows="2"
+                    oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'">Índice de Clima
+Organizacional</textarea>
             </div>
             <p class="subtitle">Dashboard de Indicadores ICQ</p>
         </div>
@@ -1153,6 +1157,34 @@
         function exportImage() {
             const dashboard = document.querySelector('.dashboard');
             const title = document.getElementById('titleInput').value || 'Dashboard ICQ';
+            
+            // Criar canvas temporario só para medir o texto
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCtx.font = 'bold 34px Inter, sans-serif';
+            
+            const maxWidth = 720; // limite de largura na imagem
+            const titleLines = [];
+            
+            // Quebra automática caso a linha não tenha 'Enter' mas seja muito grande
+            const paragraphs = title.split('\n');
+            paragraphs.forEach(paragraph => {
+                const words = paragraph.split(' ');
+                let line = '';
+                for (let n = 0; n < words.length; n++) {
+                    const testLine = line + words[n] + ' ';
+                    const metrics = tempCtx.measureText(testLine);
+                    if (metrics.width > maxWidth && n > 0) {
+                        titleLines.push(line.trim());
+                        line = words[n] + ' ';
+                    } else {
+                        line = testLine;
+                    }
+                }
+                titleLines.push(line.trim());
+            });
+
+            const extraLinesOffset = Math.max(0, (titleLines.length - 1) * 40);
 
             // Criar canvas para exportação
             const scale = 2; // Alta resolução
@@ -1164,7 +1196,7 @@
                 offset = 100; // Espaço reservado para a logo no topo
             }
             
-            const height = 1850 + offset; // Altura expandida para mostrar todas as legendas e a logo
+            const height = 1850 + offset + extraLinesOffset; // Altura expandida para mostrar todas as legendas e a logo
             const exportCanvas = document.createElement('canvas');
             exportCanvas.width = width * scale;
             exportCanvas.height = height * scale;
@@ -1190,11 +1222,18 @@
             ctx.fillStyle = '#1a1a2e';
             ctx.font = 'bold 34px Inter, sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText(title, width / 2, 80 + offset);
+            
+            let currentY = 80 + offset;
+            titleLines.forEach(line => {
+                ctx.fillText(line, width / 2, currentY);
+                currentY += 40;
+            });
             
             ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
             ctx.font = '18px Inter, sans-serif';
-            ctx.fillText('Dashboard de Indicadores ICQ', width / 2, 115 + offset);
+            ctx.fillText('Dashboard de Indicadores ICQ', width / 2, currentY - 40 + 35);
+
+            offset += extraLinesOffset; // Ajusta o Y base pros demais elementos abaixo
 
             // ----------------------------------------------------------------
             // 1. ÁREA DO GAUGE (Índice ICQ)
@@ -1325,6 +1364,11 @@
         // ============================================
         window.addEventListener('load', () => {
             updateDashboard();
+            const titleInput = document.getElementById('titleInput');
+            if (titleInput) {
+                titleInput.style.height = '';
+                titleInput.style.height = titleInput.scrollHeight + 'px';
+            }
         });
 
         // Redesenhar ao redimensionar a janela (com debounce)
